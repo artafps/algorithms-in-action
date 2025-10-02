@@ -3,12 +3,16 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
+import { Badge } from "@/components/ui/badge"
 
 type Highlight = {
   left?: [number, number]
   right?: [number, number]
   merge?: [number, number]
 }
+
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "success" | "info"
 
 export default function MergeSortVisualizer() {
   const [arr, setArr] = useState<number[]>([12,4,8,20,1,15,7,3,10,2,18,9,11,6,5])
@@ -152,15 +156,42 @@ export default function MergeSortVisualizer() {
             </Button>
           </div>
         </div>
+ <TooltipProvider>
+          <div
+            className="mt-6 flex items-end justify-center gap-1 rounded-md bg-muted p-4 cursor-pointer"
+            onClick={handleStepAdvance}
+          >
+            {arr.map((val, idx) => {
+              // map highlight ranges to badge variants
+              let variant: BadgeVariant = "outline"
 
+              if (highlight.left && idx >= highlight.left[0] && idx <= highlight.left[1]) variant = "destructive"
+              else if (highlight.right && idx >= highlight.right[0] && idx <= highlight.right[1]) variant = "info"
+              else if (highlight.merge && idx >= highlight.merge[0] && idx <= highlight.merge[1]) variant = "success"
+
+              return (
+                <Tooltip key={idx}>
+                  <TooltipTrigger asChild>
+                    <Badge variant={variant} className="flex-1 text-center py-6 text-lg font-bold">
+                      {val}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Index {idx}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )
+            })}
+          </div>
+        </TooltipProvider>
         {/* نمایش گرافیکی */}
         <div
-          className="mt-6 flex items-end h-72 gap-1 cursor-pointer rounded-md bg-slate-900 p-2"
+          className="pt-20 mt-6 flex items-end h-72 gap-1 cursor-pointer rounded-md bg-slate-900 p-2"
           onClick={handleStepAdvance}
         >
           {arr.map((val, idx) => {
             const max = Math.max(...arr, 1)
-            const h = (val / max) * 100
+            const h = ((val / max) * 100)+20
             let color = "bg-blue-400"
             if (highlight.left && idx >= highlight.left[0] && idx <= highlight.left[1])
               color = "bg-red-400"
@@ -184,3 +215,6 @@ export default function MergeSortVisualizer() {
     </Card>
   )
 }
+
+
+
