@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge,  } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 type Highlight = {
   pivot?: number
@@ -128,6 +130,7 @@ export default function QuickSortVisualizer() {
     setHighlight({})
     alert("مرتب‌سازی کامل شد!")
   }
+  type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "success" | "info"
 
   return (
     <Card className="max-w-4xl mx-auto my-6 p-4">
@@ -181,35 +184,55 @@ export default function QuickSortVisualizer() {
           </div>
         </div>
 
-        {/* visualization area: کلیک جهت جلو بردن در حالت مرحله‌ای */}
-        <div
-          className="mt-6 flex items-end h-72 gap-1 cursor-pointer rounded-md bg-slate-900 p-2"
-          onClick={handleStepAdvance}
-          role="button"
-          aria-label="visualization"
-        >
-          {arr.length === 0 ? (
-            <div className="text-sm text-slate-400">آرایه خالی</div>
-          ) : (
-            arr.map((val, idx) => {
-              const max = Math.max(...arr, 1)
-              const h = (val / max) * 100
-              let extra = "bg-blue-400"
-              if (highlight.pivot === idx) extra = "bg-yellow-400"
-              else if (highlight.left === idx) extra = "bg-red-400"
-              else if (highlight.right === idx) extra = "bg-green-400"
+        <TooltipProvider>
+          <div className="mt-6 flex items-end justify-center gap-1 rounded-md bg-muted p-4">
+            {arr.map((val, idx) => {
+              let variant: BadgeVariant = "outline"
+              if (highlight.pivot === idx) variant = "info"
+              else if (highlight.left === idx) variant = "destructive"
+              else if (highlight.right === idx) variant = "success"
 
               return (
-                <div
-                  key={idx}
-                  className={`flex-1 flex justify-center items-end ${extra} rounded-sm`}
-                  style={{ height: `${h}%` }}
-                >
-                  <span className="text-xs text-slate-900 font-bold pb-1">{val}</span>
-                </div>
+                <Tooltip key={idx}>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant={variant}
+                      className="flex-1 text-center py-6 text-lg font-bold"
+                      onClick={handleStepAdvance}
+                    >
+                      {val}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" sideOffset={6} className="rounded-md bg-slate-800 text-white px-2 py-1 text-sm">
+                    <p>Index {idx}</p>
+                  </TooltipContent>
+                </Tooltip>
               )
-            })
-          )}
+            })}
+          </div>
+        </TooltipProvider>
+        <div
+          className="pt-20 mt-6 flex items-end h-72 gap-1 cursor-pointer rounded-md bg-slate-900 p-2"
+          onClick={handleStepAdvance}
+        >
+          {arr.map((val, idx) => {
+            const max = Math.max(...arr, 1)
+            const h = ((val / max) * 100)+20
+            let color = "bg-blue-400"
+              if (highlight.pivot === idx) color = "bg-red-400"
+              else if (highlight.left === idx) color = "bg-orange-400"
+              else if (highlight.right === idx) color = "bg-green-400"
+
+            return (
+              <div
+                key={idx}
+                className={`flex-1 flex justify-center items-end ${color} rounded-sm`}
+                style={{ height: `${h}%` }}
+              >
+                <span className="text-xs text-slate-900 font-bold pb-1">{val}</span>
+              </div>
+            )
+          })}
         </div>
       </CardContent>
     </Card>

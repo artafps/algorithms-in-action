@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from "@/components/ui/badge"
 
 type Highlight = {
@@ -15,6 +15,7 @@ type Highlight = {
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "success" | "info"
 
 export default function MergeSortVisualizer() {
+  const MAX_SIZE = 20 // limit to 20 items
   const [arr, setArr] = useState<number[]>([12,4,8,20,1,15,7,3,10,2,18,9,11,6,5])
   const [speed, setSpeed] = useState<number>(200)
   const [comparisons, setComparisons] = useState(0)
@@ -22,10 +23,12 @@ export default function MergeSortVisualizer() {
   const [stepMode, setStepMode] = useState(false)
   const [highlight, setHighlight] = useState<Highlight>({})
   const [isSorting, setIsSorting] = useState(false)
+  const [truncatedCount, setTruncatedCount] = useState<number | null>(null) // show when input trimmed
   const stepResolve = useRef<(() => void) | null>(null)
 
   function randomArray(n: number) {
-    return Array.from({ length: n }, () => Math.floor(Math.random() * 100) + 1)
+    const size = Math.min(n, MAX_SIZE)
+    return Array.from({ length: size }, () => Math.floor(Math.random() * 100) + 1)
   }
 
   async function sleep(ms: number) {
@@ -117,9 +120,9 @@ export default function MergeSortVisualizer() {
       <CardContent>
         {/* کنترل‌ها */}
         <div className="flex flex-wrap gap-3 mb-4">
-          <Button onClick={() => setArr(randomArray(20))}>تولید آرایه تصادفی</Button>
-          <Button onClick={() => !isSorting && mergeSortVisual([...arr])}>شروع مرتب‌سازی</Button>
-          <Button variant="outline" onClick={() => setStepMode(!stepMode)}>
+          <Button variant="secondary"  onClick={() => setArr(randomArray(MAX_SIZE))}>تولید آرایه تصادفی</Button>
+          <Button variant="secondary"  onClick={() => !isSorting && mergeSortVisual([...arr])}>شروع مرتب‌سازی</Button>
+          <Button variant="secondary"  onClick={() => setStepMode(!stepMode)}>
             {stepMode ? "غیرفعال کردن حالت مرحله‌ای" : "نمایش مرحله‌ای"}
           </Button>
           <div className="flex items-center gap-2">
@@ -136,35 +139,44 @@ export default function MergeSortVisualizer() {
 
         {/* Textarea + Stats */}
         <div className="flex gap-4 flex-wrap">
-          <Textarea
-            className="flex-1"
-            value={arr.join(",")}
-            onChange={(e) =>
-              setArr(
-                e.target.value
+          <div className="flex-1">
+            <Textarea
+              className="w-full"
+              value={arr.join(",")}
+              onChange={(e) => {
+                const values = e.target.value
                   .split(",")
                   .map((s) => parseFloat(s.trim()))
                   .filter((n) => !isNaN(n))
-              )
-            }
-          />
+                if (values.length > MAX_SIZE) {
+                  setTruncatedCount(values.length - MAX_SIZE)
+                  setArr(values.slice(0, MAX_SIZE))
+                } else {
+                  setTruncatedCount(null)
+                  setArr(values)
+                }
+              }}
+            />
+            {truncatedCount !== null && (
+              <div className="text-xs text-yellow-400 mt-1">
+                ورودی به {MAX_SIZE} مقدار محدود شد — {truncatedCount} مقدار حذف شد
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-col gap-2 text-sm">
             <div>مقایسه‌ها: {comparisons}</div>
             <div>جابجایی‌ها: {writes}</div>
-            <Button variant="outline" onClick={() => setArr([...arr])}>
+            <Button variant="secondary" onClick={() => setArr([...arr])}>
               ریست
             </Button>
           </div>
         </div>
- <TooltipProvider>
-          <div
-            className="mt-6 flex items-end justify-center gap-1 rounded-md bg-muted p-4 cursor-pointer"
-            onClick={handleStepAdvance}
-          >
-            {arr.map((val, idx) => {
-              // map highlight ranges to badge variants
-              let variant: BadgeVariant = "outline"
 
+        <TooltipProvider>
+          <div className="mt-6 flex items-end justify-center gap-1 rounded-md bg-muted p-4">
+            {arr.map((val, idx) => {
+              let variant: BadgeVariant = "outline"
               if (highlight.left && idx >= highlight.left[0] && idx <= highlight.left[1]) variant = "destructive"
               else if (highlight.right && idx >= highlight.right[0] && idx <= highlight.right[1]) variant = "info"
               else if (highlight.merge && idx >= highlight.merge[0] && idx <= highlight.merge[1]) variant = "success"
@@ -172,11 +184,15 @@ export default function MergeSortVisualizer() {
               return (
                 <Tooltip key={idx}>
                   <TooltipTrigger asChild>
-                    <Badge variant={variant} className="flex-1 text-center py-6 text-lg font-bold">
+                    <Badge
+                      variant={variant}
+                      className="flex-1 text-center py-6 text-lg font-bold"
+                      onClick={handleStepAdvance}
+                    >
                       {val}
                     </Badge>
                   </TooltipTrigger>
-                  <TooltipContent>
+                  <TooltipContent side="top" sideOffset={6} className="rounded-md bg-slate-800 text-white px-2 py-1 text-sm">
                     <p>Index {idx}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -184,6 +200,7 @@ export default function MergeSortVisualizer() {
             })}
           </div>
         </TooltipProvider>
+
         {/* نمایش گرافیکی */}
         <div
           className="pt-20 mt-6 flex items-end h-72 gap-1 cursor-pointer rounded-md bg-slate-900 p-2"

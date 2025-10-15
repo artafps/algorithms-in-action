@@ -50,7 +50,7 @@ function App() {
                   rel="noopener noreferrer"
                   className="text-sky-600 hover:underline"
                 >
-                  Powered by: artafps
+                  Powered by : artafps
                 </a>
               </h3>
             <h3>Vite + React</h3>

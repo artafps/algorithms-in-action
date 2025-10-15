@@ -119,14 +119,14 @@ export default function BubbleSortVisualizer() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-3 mb-4">
-          <Button onClick={handleRandom} disabled={isSorting}>
+          <Button variant="secondary" onClick={handleRandom} disabled={isSorting}>
             تولید آرایه تصادفی
           </Button>
-          <Button onClick={handleStart} disabled={isSorting}>
+          <Button variant="secondary" onClick={handleStart} disabled={isSorting}>
             شروع مرتب‌سازی
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => setStepMode(!stepMode)}
             disabled={isSorting}
           >
@@ -152,7 +152,7 @@ export default function BubbleSortVisualizer() {
             <input
               type="range"
               min={5}
-              max={80}
+              max={20}
               value={size}
               onChange={(e) => setSize(Number(e.target.value))}
               className="w-36"
@@ -171,7 +171,7 @@ export default function BubbleSortVisualizer() {
             <div>مقایسه‌ها: {comparisons}</div>
             <div>جابجایی‌ها: {swaps}</div>
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => {
                 setArr([...arr]);
                 setComparisons(0);
