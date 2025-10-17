@@ -65,7 +65,7 @@ export default function BubbleSortVisualizer() {
   }
 
   const handleRandom = () => {
-    const n = Math.max(5, Math.min(80, size || 20));
+    const n = Math.max(5, Math.min(20, size || 10));
     const r = randomArray(n);
     setArr(r);
     setComparisons(0);
@@ -119,14 +119,25 @@ export default function BubbleSortVisualizer() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-3 mb-4">
-          <Button variant="secondary" onClick={handleRandom} disabled={isSorting}>
+          <Button
+            variant="destructive"
+            className="m-2"
+            onClick={handleRandom}
+            disabled={isSorting}
+          >
             تولید آرایه تصادفی
           </Button>
-          <Button variant="secondary" onClick={handleStart} disabled={isSorting}>
+          <Button
+            variant="destructive"
+            className="m-2"
+            onClick={handleStart}
+            disabled={isSorting}
+          >
             شروع مرتب‌سازی
           </Button>
           <Button
-            variant="secondary"
+            variant="destructive"
+            className="m-2"
             onClick={() => setStepMode(!stepMode)}
             disabled={isSorting}
           >
@@ -171,7 +182,8 @@ export default function BubbleSortVisualizer() {
             <div>مقایسه‌ها: {comparisons}</div>
             <div>جابجایی‌ها: {swaps}</div>
             <Button
-              variant="secondary"
+              variant="destructive"
+              className="m-2"
               onClick={() => {
                 setArr([...arr]);
                 setComparisons(0);

@@ -2,12 +2,11 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { Button } from "./components/ui/button.tsx";
 import MergeSortVisualizer from "./common/MergeSortVisualizer.tsx";
 import QuickSortVisualizer from "./common/Qsort.tsx";
 import BubbleSortVisualizer from "./common/Bsort.tsx";
 import BinarySearchVisualizer from "./common/binerysearch.tsx";
-import LinearSearchVisualizer from "./common/ss.tsx";
+import LinearSearchVisualizer from "./common/Linearsearch.tsx";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs"; // added import
 
 function App() {
@@ -22,21 +21,21 @@ function App() {
               <h1 className="text-xl font-bold mb-2">Algorithm Design Course</h1>
 
           <TabsList>
-            <TabsTrigger className="m-2" value="Main">Main</TabsTrigger>
+            <TabsTrigger  className="m-2" value="Main">Main</TabsTrigger>
             <TabsTrigger className="m-2" value="MergeSortVisualizer">
-              MergeSortVisualizer
+              Merge Sort Visualizer
             </TabsTrigger>
             <TabsTrigger className="m-2" value="BubbleSortVisualizer">
-              BubbleSortVisualizer
+              Bubble Sort Visualizer
             </TabsTrigger>
             <TabsTrigger className="m-2" value="QuickSortVisualizer">
-              QuickSortVisualizer
+              Quick Sort Visualizer
             </TabsTrigger>
             <TabsTrigger className="m-2" value="BinarySearchVisualizer">
-              BinarySearchVisualizer
+              Binary Search Visualizer
             </TabsTrigger>
             <TabsTrigger className="m-2" value="LinearSearchVisualizer">
-              LinearSearchVisualizer
+              Linear Search Visualizer
             </TabsTrigger>
           </TabsList>
           <TabsContent value="Main">

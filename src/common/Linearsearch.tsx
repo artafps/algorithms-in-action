@@ -1,39 +1,28 @@
+"use client";
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 
 type Highlight = {
-  left?: number;
-  right?: number;
-  mid?: number;
-  found?: boolean;
+  current?: number;
+  found?: number;
 };
 
-type BadgeVariant =
-  | "default"
-  | "secondary"
-  | "destructive"
-  | "outline"
-  | "success"
-  | "info";
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "success" | "info";
 
-export default function BinarySearchVisualizer() {
-  const [arr, setArr] = useState<number[]>([1, 3, 4, 7, 8, 10, 12, 15, 20]);
-  const [speed, setSpeed] = useState<number>(400);
-  const [target, setTarget] = useState<number>(7);
+export default function LinearSearchVisualizer() {
+  const [arr, setArr] = useState<number[]>([12, 4, 8, 20, 1, 15, 7, 3, 10]);
+  const [speed, setSpeed] = useState<number>(300);
+  const [comparisons, setComparisons] = useState<number>(0);
   const [stepMode, setStepMode] = useState<boolean>(false);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [highlight, setHighlight] = useState<Highlight>({});
-  const [result, setResult] = useState<number | null>(null);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [target, setTarget] = useState<number | null>(null);
   const stepResolve = useRef<(() => void) | null>(null);
 
   function sleep(ms: number) {
@@ -58,66 +47,55 @@ export default function BinarySearchVisualizer() {
     return text
       .split(",")
       .map((s) => parseFloat(s.trim()))
-      .filter((n) => !isNaN(n))
-      .sort((a, b) => a - b); // حتماً مرتب
+      .filter((n) => !isNaN(n));
   }
-
-  const handleLoadFromText = (text: string) => {
-    const parsed = parseTextToArray(text);
-    if (parsed.length > 0) {
-      setArr(parsed);
-      setResult(null);
-    }
-  };
 
   const handleRandom = () => {
     const r = Array.from(
-      { length: 12 },
+      { length: 15 },
       () => Math.floor(Math.random() * 100) + 1
-    ).sort((a, b) => a - b);
+    );
     setArr(r);
-    setResult(null);
+    setComparisons(0);
+    setHighlight({});
   };
 
-  const handleStart = async () => {
-    if (isSearching) return;
-    if (!arr || arr.length === 0) return alert("آرایه خالی است.");
+  const handleLoadFromText = (text: string) => {
+    const parsed = parseTextToArray(text);
+    if (parsed.length > 0) setArr(parsed);
+  };
 
+  const handleSearch = async () => {
+    if (isSearching || target === null) return;
+    if (arr.length === 0) return alert("آرایه خالی است.");
+
+    setComparisons(0);
+    setHighlight({});
     setIsSearching(true);
-    setResult(null);
 
-    let left = 0;
-    let right = arr.length - 1;
-
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-      setHighlight({ left, right, mid });
+    for (let i = 0; i < arr.length; i++) {
+      setHighlight({ current: i });
+      setComparisons((c) => c + 1);
       await sleep(speed);
       await waitForStep();
 
-      if (arr[mid] === target) {
-        setHighlight({ left, right, mid, found: true });
-        setResult(mid);
-        break;
-      } else if (arr[mid] < target) {
-        left = mid + 1;
-      } else {
-        right = mid - 1;
+      if (arr[i] === target) {
+        setHighlight({ found: i });
+        setIsSearching(false);
+        alert(`عنصر ${target} در ایندکس ${i} پیدا شد ✅`);
+        return;
       }
     }
 
-    if (result === null) {
-      setResult(-1);
-    }
-
     setIsSearching(false);
+    alert(`عنصر ${target} پیدا نشد ❌`);
   };
 
   return (
     <Card className="max-w-4xl mx-auto my-6 p-4">
       <CardHeader>
         <CardTitle className="text-lg">
-          جستجوی دودویی — Binary Search (نمایش گرافیکی)
+          جستجوی خطی — Linear Search (نمایش گرافیکی)
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -128,12 +106,12 @@ export default function BinarySearchVisualizer() {
             onClick={handleRandom}
             disabled={isSearching}
           >
-            تولید آرایه تصادفی (مرتب)
+            تولید آرایه تصادفی
           </Button>
           <Button
             variant="destructive"
             className="m-2"
-            onClick={handleStart}
+            onClick={handleSearch}
             disabled={isSearching}
           >
             شروع جستجو
@@ -144,9 +122,7 @@ export default function BinarySearchVisualizer() {
             onClick={() => setStepMode(!stepMode)}
             disabled={isSearching}
           >
-            {stepMode
-              ? "غیرفعال کردن حالت مرحله‌ای"
-              : "نمایش مرحله‌ای (گام‌به‌گام)"}
+            {stepMode ? "غیرفعال کردن حالت مرحله‌ای" : "نمایش مرحله‌ای"}
           </Button>
 
           <div className="flex items-center gap-2">
@@ -154,20 +130,20 @@ export default function BinarySearchVisualizer() {
             <div className="w-36">
               <Slider
                 defaultValue={[speed]}
-                min={100}
-                max={2000}
+                min={50}
+                max={1000}
                 onValueChange={(v) => setSpeed(v[0])}
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm">هدف</span>
-            <input
-              type="text"
-              value={target}
-              onChange={(e) => setTarget(Number(e.target.value))}
-              className="w-24 border rounded px-2 py-1 text-sm"
+            <span className="text-sm">عنصر هدف</span>
+            <Input
+              type="number"
+              value={target ?? ""}
+              onChange={(e) => setTarget(parseInt(e.target.value))}
+              className="w-24"
             />
           </div>
         </div>
@@ -179,19 +155,12 @@ export default function BinarySearchVisualizer() {
             onChange={(e) => handleLoadFromText(e.target.value)}
           />
           <div className="flex flex-col gap-2 text-sm">
-            <div>
-              نتیجه:{" "}
-              {result === null
-                ? "—"
-                : result === -1
-                ? "پیدا نشد"
-                : `ایندکس ${result}`}
-            </div>
+            <div>مقایسه‌ها: {comparisons}</div>
             <Button
               variant="destructive"
               className="m-2"
               onClick={() => {
-                setResult(null);
+                setComparisons(0);
                 setHighlight({});
               }}
               disabled={isSearching}
@@ -201,14 +170,13 @@ export default function BinarySearchVisualizer() {
           </div>
         </div>
 
+        {/* badges row (keeps the visual bars below) */}
         <TooltipProvider>
           <div className="mt-6 flex items-end justify-center gap-1 rounded-md bg-muted p-4">
             {arr.map((val, idx) => {
               let variant: BadgeVariant = "outline";
-              if (highlight.mid === idx)
-                variant = highlight.found ? "success" : "info";
-              else if (highlight.left === idx) variant = "destructive";
-              else if (highlight.right === idx) variant = "success";
+              if (highlight.found === idx) variant = "success";
+              else if (highlight.current === idx) variant = "info";
 
               return (
                 <Tooltip key={idx}>
@@ -236,17 +204,16 @@ export default function BinarySearchVisualizer() {
 
         {/* visualization area */}
         <div
-          className="mt-6 flex items-end h-72 gap-1 rounded-md bg-slate-900 p-2"
-          role="group"
+          className="mt-6 flex items-end h-72 gap-1 cursor-pointer rounded-md bg-slate-900 p-2"
+          onClick={handleStepAdvance}
+          role="button"
         >
           {arr.map((val, idx) => {
             const max = Math.max(...arr, 1);
             const h = (val / max) * 100;
             let extra = "bg-blue-400";
-            if (highlight.left === idx) extra = "bg-orange-400";
-            if (highlight.right === idx) extra = "bg-purple-400";
-            if (highlight.mid === idx)
-              extra = highlight.found ? "bg-green-500" : "bg-red-400";
+            if (highlight.current === idx) extra = "bg-yellow-400";
+            if (highlight.found === idx) extra = "bg-green-500";
             return (
               <div
                 key={idx}
