@@ -10,8 +10,6 @@ import LinearSearchVisualizer from "./common/Linearsearch.tsx";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs"; // added import
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <div>
