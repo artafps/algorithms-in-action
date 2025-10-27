@@ -1,26 +1,18 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "ES2023",
-    "lib": ["ES2023"],
-    "module": "ESNext",
-    "types": [],
-    "skipLibCheck": true,
+    /* لازم برای پروژه‌های مرجع */
+    "composite": true,
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
+    /* مخصوص Node / Vite config */
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    /* خروجی نمی‌خواهیم، فقط بررسی تایپ */
     "noEmit": true,
 
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    /* Node typings برای path, url, import.meta.url */
+    "types": ["node"]
   },
   "include": ["vite.config.ts"]
 }
