@@ -5,9 +5,16 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "types": ["node"],        // ✅ لازم برای path، __dirname و بقیه
+    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "strict": true
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src", "vite.config.ts"]
 }
+
