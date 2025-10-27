@@ -1,18 +1,11 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    /* لازم برای پروژه‌های مرجع */
     "composite": true,
-
-    /* مخصوص Node / Vite config */
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-
-    /* خروجی نمی‌خواهیم، فقط بررسی تایپ */
-    "noEmit": true,
-
-    /* Node typings برای path, url, import.meta.url */
-    "types": ["node"]
+    "types": ["node"],
+    "noEmit": true
   },
   "include": ["vite.config.ts"]
 }
