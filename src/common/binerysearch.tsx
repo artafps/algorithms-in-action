@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import  { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
