@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [react()],
-  base: "/algorithms-in-action/",
+  base: "https://artafps.github.io/algorithms-in-action/",
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
